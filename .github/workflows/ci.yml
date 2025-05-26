@@ -18,6 +18,7 @@ jobs:
       db:
         image: postgres:17.4-bookworm
         env:
+          LANG: ja_JP.utf8
           TZ: Asia/Tokyo
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: __ENTER_POSTGRES_PASSWORD_HERE__
