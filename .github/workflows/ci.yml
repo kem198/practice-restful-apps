@@ -18,13 +18,17 @@ jobs:
       db:
         image: postgres:17.4-bookworm
         env:
-          LANG: ja_JP.utf8
           TZ: Asia/Tokyo
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: __ENTER_POSTGRES_PASSWORD_HERE__
           POSTGRES_DB: todos_db
         ports:
           - 54322:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - name: Setup Java
