@@ -98,7 +98,7 @@ $ cd src/todos-api
 ### Run API Server
 
 ```shell
-# Move to repository root
+# Move to application root
 $ cd todos-api
 $ pwd
 /path/to/your/repo/practice-restful-apps/src/todos-api
