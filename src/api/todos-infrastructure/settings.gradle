@@ -1,0 +1,4 @@
+rootProject.name = 'todos-infrastructure'
+include 'todos-domain'
+
+project(':todos-domain').projectDir = new File('../todos-domain')
