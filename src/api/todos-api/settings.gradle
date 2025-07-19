@@ -1,0 +1,3 @@
+rootProject.name = 'todos-api'
+include('todos-core')
+project(':todos-core').projectDir = new File('../todos-core')

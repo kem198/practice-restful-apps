@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src/todos-api
+        working-directory: ./src/api/todos-api
     services:
       db:
         image: postgres:17.4-bookworm
@@ -35,8 +35,8 @@ jobs:
         run: |
           # HACK: docker-entrypoint-initdb.d 用の SQL ファイルを直接実行する
           # テスト実行用のテーブルを作成するため。もっといい方法あるはず
-          PGPASSWORD=__ENTER_POSTGRES_PASSWORD_HERE__ psql -h localhost -p 5432 -U postgres -d todos_db -f ../../postgres/init/01_create_todos.sql
-          PGPASSWORD=__ENTER_POSTGRES_PASSWORD_HERE__ psql -h localhost -p 5432 -U postgres -d todos_db -f ../../postgres/init/99_create_examples.sql
+          PGPASSWORD=__ENTER_POSTGRES_PASSWORD_HERE__ psql -h localhost -p 5432 -U postgres -d todos_db -f ../../../postgres/init/01_create_todos.sql
+          PGPASSWORD=__ENTER_POSTGRES_PASSWORD_HERE__ psql -h localhost -p 5432 -U postgres -d todos_db -f ../../../postgres/init/99_create_examples.sql
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
