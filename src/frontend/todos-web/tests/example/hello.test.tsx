@@ -1,4 +1,4 @@
-import { Hello } from "@/components/example/hello";
+import { Hello } from "@/components/example/hello/hello";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 

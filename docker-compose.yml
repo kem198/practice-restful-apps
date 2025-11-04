@@ -4,20 +4,46 @@ services:
     ports:
       - 5432:5432
     environment:
-      - LANG
-      - TZ
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+      LANG: "${LANG:-ja_JP.UTF-8}"
+      TZ: "${TZ:-Asia/Tokyo}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      POSTGRES_DB: "${POSTGRES_DB:-todos_db}"
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
-      - db-volume:/var/lib/postgresql/dataS
+      - db-volume:/var/lib/postgresql/data
     logging:
       driver: "json-file"
       options:
         max-size: "1m"
         max-file: "2"
-    restart: always
+    restart: on-failure
+
+  # api:
+  #   image: gradle:9.1.0-jdk21
+  #   working_dir: /workspace/src/backend
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/${POSTGRES_DB:-todos_db}"
+  #     SPRING_DATASOURCE_USERNAME: "${POSTGRES_USER:-postgres}"
+  #     SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+  #     LANG: "${LANG:-ja_JP.UTF-8}"
+  #     TZ: "${TZ:-Asia/Tokyo}"
+  #     GRADLE_USER_HOME: "/home/gradle/.gradle"
+  #   volumes:
+  #     - ./src/backend:/workspace/src/backend:cached
+  #     - api-gradle-cache:/home/gradle/.gradle
+  #   depends_on:
+  #     - db
+  #   command: sh -c "./gradlew bootRun --no-daemon"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "1m"
+  #       max-file: "2"
+  #   restart: on-failure
 
 volumes:
   db-volume:
+  # api-gradle-cache:

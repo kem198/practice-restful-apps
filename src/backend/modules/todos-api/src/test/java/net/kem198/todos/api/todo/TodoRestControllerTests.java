@@ -131,6 +131,54 @@ public class TodoRestControllerTests {
         }
 
         @Test
+        @DisplayName("Todo の finished が true で渡された場合、データベースに true で保存されること")
+        void shouldSaveTodoFinishedWhenPassedFinished() throws Exception {
+            // Act
+            String requestBody = """
+                        {
+                            "todoTitle": "Hello World!",
+                            "todoDescription": "Hello Todo Description!",
+                            "finished": true
+                        }
+                    """;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity("/v1/todos", requestEntity, String.class);
+
+            // Assert
+            JsonNode responseBody = objectMapper.readTree(response.getBody());
+            String createdTodoId = responseBody.get("todoId").asText();
+            Todo savedTodo = todoRepository.findById(createdTodoId);
+            assertNotNull(savedTodo);
+            assertTrue(savedTodo.isFinished());
+        }
+
+        @Test
+        @DisplayName("Todo の finished が false で渡された場合、データベースに false で保存されること")
+        void shouldSaveTodoUnfinishedWhenPassedUnfinished() throws Exception {
+            // Act
+            String requestBody = """
+                        {
+                            "todoTitle": "Hello World!",
+                            "todoDescription": "Hello Todo Description!",
+                            "finished": false
+                        }
+                    """;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity("/v1/todos", requestEntity, String.class);
+
+            // Assert
+            JsonNode responseBody = objectMapper.readTree(response.getBody());
+            String createdTodoId = responseBody.get("todoId").asText();
+            Todo savedTodo = todoRepository.findById(createdTodoId);
+            assertNotNull(savedTodo);
+            assertFalse(savedTodo.isFinished());
+        }
+
+        @Test
         @DisplayName("作成された Todo と 201 を返すこと")
         void shouldReturnCreatedTodoWith201() throws Exception {
             // Act
@@ -161,7 +209,7 @@ public class TodoRestControllerTests {
         void shouldReturnBadRequestWith400WhenUnfinishedTodoLimitReached() throws Exception {
             // Arrange
             // 未完了 Todo を上限まで作成する
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 100; i++) {
                 Todo todo = makeTestTodo("Todo " + i, "Description " + i);
                 todoRepository.create(todo);
             }
@@ -190,7 +238,7 @@ public class TodoRestControllerTests {
         void shouldNotCreateTodoWhenUnfinishedTodoLimitReached() throws Exception {
             // Arrange
             // 未完了 Todo を上限まで作成する
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 100; i++) {
                 Todo todo = makeTestTodo("Todo " + i, "Description " + i);
                 todoRepository.create(todo);
             }
@@ -210,7 +258,7 @@ public class TodoRestControllerTests {
 
             // Assert
             Collection<Todo> allTodos = todoRepository.findAll();
-            assertEquals(5, allTodos.size()); // 上限の 5 個のままで増えていない
+            assertEquals(100, allTodos.size()); // 上限のままで増えていない
             assertTrue(allTodos.stream().noneMatch(todo -> "Overflow Todo".equals(todo.getTodoTitle())));
         }
 

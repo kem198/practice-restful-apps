@@ -1,0 +1,19 @@
+{
+  "name": "KeM's Todos",
+  "display": "standalone",
+  "start_url": "/todos",
+  "background_color": "#262626",
+  "theme_color": "#262626",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

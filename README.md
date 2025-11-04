@@ -227,6 +227,19 @@ If you want to see more commands, please refer to [backend/README.md](./src/back
 
 ## 6. Demo: Backend APIs
 
+> [!TIP]
+> You can view the API documentation using [Swagger UI](https://swagger.io/tools/swagger-ui/).
+>
+> <img src="./docs/img/swagger.png" alt="swagger" width="600">
+>
+> 1. Run the API server.
+>
+>     ```sh
+>     ./gradlew bootRun
+>     ```
+>
+> 2. Access [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
+
 ### 6.1. `/v1/greeting`
 
 ```sh
@@ -448,6 +461,12 @@ Connection: close
 - [TDD Boot Camp 2020 Online \#1 基調講演/ライブコーディング - YouTube](https://www.youtube.com/watch?v=Q-FJ3XmFlT8)
 
 <!-- omit in toc -->
+### PWA
+
+- [kem198/practice-pwa](https://github.com/kem198/practice-pwa)
+- [Metadata Files: manifest.json \| Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest)
+
+<!-- omit in toc -->
 ### Spring Boot
 
 - [Spring Boot in Visual Studio Code](https://code.visualstudio.com/docs/java/java-spring-boot)
@@ -464,10 +483,11 @@ Connection: close
     - [domaframework/simple-examples: Doma Simple Examples](https://github.com/domaframework/simple-examples)
 
 <!-- omit in toc -->
-### PWA
+### Swagger
 
-- [kem198/practice-pwa](https://github.com/kem198/practice-pwa)
-- [Metadata Files: manifest.json \| Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest)
+- [REST API Documentation Tool \| Swagger UI](https://swagger.io/tools/swagger-ui/)
+- [【Java】SwaggerでAPI仕様を見れるところまでやってみた（swagger-core × springdoc-openapi-ui） \#SpringBoot - Qiita](https://qiita.com/crml1206/items/e47ec484af750d301953)
+- [OpenAPI 3 Library for spring-boot](https://springdoc.org/#general-overview)
 
 <!-- omit in toc -->
 ### Others

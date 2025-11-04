@@ -1,0 +1,113 @@
+name: CI - End-to-End
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "src/**"
+      - "postgres/**"
+      - ".github/workflows/ci-e2e.yml"
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "src/**"
+      - "postgres/**"
+      - ".github/workflows/ci-e2e.yml"
+  workflow_dispatch:
+
+jobs:
+  ci-e2e:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:17.4-bookworm
+        env:
+          TZ: Asia/Tokyo
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: __ENTER_POSTGRES_PASSWORD_HERE__
+          POSTGRES_DB: todos_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - uses: actions/checkout@v4
+
+      # Setup Database
+      - name: Setup Database
+        run: |
+          PGPASSWORD=__ENTER_POSTGRES_PASSWORD_HERE__ psql -h localhost -p 5432 -U postgres -d todos_db -f ./postgres/init/01_create_todos.sql
+          PGPASSWORD=__ENTER_POSTGRES_PASSWORD_HERE__ psql -h localhost -p 5432 -U postgres -d todos_db -f ./postgres/init/99_create_examples.sql
+
+      # Setup and Run Backend API
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: gradle
+      - name: Build and Start Backend
+        working-directory: ./src/backend
+        run: |
+          ./gradlew build --no-daemon
+          java -jar modules/todos-api/build/libs/todos-api-0.0.1-SNAPSHOT.jar &
+          timeout 60 bash -c 'until curl -f http://localhost:8080/v1/greeting/hello; do sleep 2; done'
+
+      # Setup and Run Frontend
+      - name: Extract Node.js version from package.json
+        working-directory: ./src/frontend/todos-web
+        run: echo "NODE_VERSION=$(jq -r '.volta.node' package.json)" >> $GITHUB_ENV
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "./src/frontend/todos-web/package-lock.json"
+      - name: Install Frontend Dependencies
+        working-directory: ./src/frontend/todos-web
+        run: npm ci
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('src/frontend/todos-web/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      - name: Install Playwright Browsers
+        working-directory: ./src/frontend/todos-web
+        run: npx playwright install --with-deps
+      - name: Build and Start Frontend
+        working-directory: ./src/frontend/todos-web
+        env:
+          API_BASE_URL: http://localhost:8080
+        run: |
+          npm run build
+          npm start &
+          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+
+      # Run E2E tests
+      - name: Run E2E tests
+        working-directory: ./src/frontend/todos-web
+        env:
+          API_BASE_URL: http://localhost:8080
+        run: npm run e2e
+
+      # Upload artifacts
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: src/frontend/todos-web/playwright-report/
+          retention-days: 30

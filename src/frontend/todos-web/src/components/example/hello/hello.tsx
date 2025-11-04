@@ -1,9 +1,9 @@
 import type { FC } from "react";
 
-export interface HelloProps {
+export type HelloProps = {
   name?: string;
   className?: string;
-}
+};
 
 export const Hello: FC<HelloProps> = ({ name = "World", className }) => {
   return (

@@ -16,7 +16,7 @@ import net.kem198.todos.core.repository.todo.TodoRepository;
 @Service
 @Transactional
 public class TodoServiceImpl implements TodoService {
-    private static final long MAX_UNFINISHED_COUNT = 5;
+    private static final long MAX_UNFINISHED_COUNT = 100;
 
     private final TodoRepository todoRepository;
 
@@ -52,7 +52,7 @@ public class TodoServiceImpl implements TodoService {
 
         todo.setTodoId(todoId);
         todo.setCreatedAt(createdAt);
-        todo.setFinished(false);
+        todo.setFinished(Boolean.TRUE.equals(todo.isFinished()));
 
         todoRepository.create(todo);
 
