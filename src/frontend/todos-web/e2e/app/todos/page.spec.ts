@@ -66,4 +66,45 @@ test.describe("Todos ページのテスト", () => {
       }
     });
   });
+
+  test.describe("タスク編集時のテスト", () => {
+    test("チェックボタンからタスクを完了した結果、Todo が完了状態になること", async ({
+      page,
+    }) => {
+      // Arrange
+      // DB へ初期データを投入しておく
+      const res = await page.request.post(`${apiBaseUrl}/v1/todos`, {
+        headers: { "Content-Type": "application/json" },
+        data: {
+          todoTitle: "Added Task 3",
+          todoDescription: "Added Task 3 description",
+        },
+      });
+      expect(res.ok()).toBeTruthy();
+      const { todoId } = (await res.json()) as { todoId?: string };
+      await page.goto("/todos");
+
+      // Act
+      await page.getByRole("button", { name: "TodoToggle" }).first().click();
+
+      // Assert
+      const resAfter = await page.request.get(`${apiBaseUrl}/v1/todos`);
+      expect(res.ok()).toBeTruthy();
+      const todos = (await resAfter.json()) as Array<Todo>;
+      const todo = todos.find((t) => t.todoTitle === "Added Task 3");
+
+      await expect(todo?.finished).toBeTruthy();
+
+      // Cleanup
+      if (todoId) {
+        await page.request
+          .delete(`${apiBaseUrl}/v1/todos/${todoId}`)
+          .catch(() => {});
+      }
+    });
+
+    test.skip("入力フォームからタスクを編集した結果、Todo のタイトルが変更できること", async ({
+      page,
+    }) => {});
+  });
 });
